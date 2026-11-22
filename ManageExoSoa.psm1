@@ -24,6 +24,16 @@ $telemetryStartTime = get-universalDateTime
 $windowTitle = ("Start-ManageExoSOA")
 $host.ui.RawUI.WindowTitle = $windowTitle
 
+#Define telemetry values.
+
+#Create telemetry values.
+
+$telemetryValues = @{}
+$telemetryValues['telemetryM365DomainMgmtVersion']="None"
+$telemetryValues['telemetryExchangeOnlineVersion']="None"
+$telemetryValues['telemetryEventName']="Start-M365DomainManagement"
+
+
 #Initialize telemetry collection.
 
 $appInsightAPIKey = "63d673af-33f4-401c-931e-f0b64a218d89"
@@ -34,3 +44,17 @@ if ($allowTelemetryCollection -eq $TRUE)
     start-telemetryConfiguration -allowTelemetryCollection $allowTelemetryCollection -appInsightAPIKey $appInsightAPIKey -traceModuleName $traceModuleName
 }
 
+$telemetryEndTime = get-universalDateTime
+
+    [double]$telemetryElapsedSeconds = get-elapsedTime -startTime $telemetryStartTime -endTime $telemetryEndTime
+
+    $telemetryEventProperties = @{
+        M365DomainMGMT = "Start-M365DomainManagement"
+        M365DomainMGMTVersion = $telemetryValues.telemetryM365DomainMgmtVersion
+        ExchangeOnline = $telemetryValues.telemetryExchangeOnlineVersion
+        OperationSelected = $domainOperation
+    }
+
+    $telemetryEventMetrics = @{
+         TotalTime = $telemetryElapsedSeconds  
+    }
