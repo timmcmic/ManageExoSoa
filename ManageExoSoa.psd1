@@ -30,7 +30,7 @@ CompanyName = 'Microsoft CSS'
 Copyright = '(c) timmcmic. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'Provides bulk functionality for setting the exo soa bit on mailboxes.'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -73,7 +73,7 @@ RequiredModules = @(
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('get-ElapsedTime.ps1','Test-PowershellModule.ps1','send-TelemetryEvent.ps1','start-telemetryConfiguration.ps1','get-universalDateTime.ps1','new-logfile.ps1','out-logfile.ps1','generate-htmlreport.ps1')
+NestedModules = @('test-credentials.ps1','get-ElapsedTime.ps1','Test-PowershellModule.ps1','send-TelemetryEvent.ps1','start-telemetryConfiguration.ps1','get-universalDateTime.ps1','new-logfile.ps1','out-logfile.ps1','generate-htmlreport.ps1')
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @('start-manageExoSOA')
