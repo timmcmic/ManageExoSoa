@@ -17,23 +17,56 @@ function start-ExchangeProcessing
 
     out-logfile -string "Entering start-ExchangeProcessing"
 
-    $chunks | foreach-object -Parallel {
-        begin {
-            $threadCounter = 0 ; $credentialCounter = 0
-        } 
-        process {
-            $threadCounter++
-            out-logfile -string ("This is the current thread counter: "+$threadCounter.tostring())
-            out-logfile -string ("This is the current credential counter: "+$credentialCounter.tostring())
+    $myFunction = ${function:out-logfile}.tostring()
+    $counter = [System.Collections.Concurrent.ConcurrentDictionary[string,int]]::new()
 
-            if ($credentialCounter -eq 4)
+    $counter['Count'] = 0
+
+    $chunks | foreach-object -Parallel {
+        process {
+            $global:logfile = $using:logFile
+            $function = $using:myFunction
+            $counter = $using:counter
+            $exoCredentials = $using:exoCredentials
+            
+            $scriptblock = [scriptblock]::Create($function)
+
+            set-item -path "Function:\Out-Logfile" -value $scriptBlock
+
+            out-logfile -string "Increment the thread counter."
+
+            $threadCounter = $counter.addOrUpdate('Count',1,[Func[string,int,int]] { param($key, $value) $value + 1 })
+            $credentialCounter = $threadCounter % $exoCredentials.count
+
+            out-logfile -string ("This is the current thread counter: "+$threadCounter.tostring())
+            out-logfile  -string ("This is the current credential counter: "+$credentialCounter.tostring())
+
+            out-logfile -string ($threadCounter.tostring() + ":Thread attempting exchange online connection.")
+
+            try
             {
-                $credentialCounter = 0
+                connect-exchangeonline -credential $exoCredential[$credentialCounter] -errorAction STOP
             }
-            else
+            catch
             {
-                $credentialCounter++
+                out-logfile -string ($threadCounter.tostring() + ":Thread attempting exchange online connection.")
+                out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+                exit
             }
+
+            out-logfile -string ($threadCounter.tostring() + ":Disconnecting from Exchange Online.")
+
+            try
+            {
+                disconnect-exchangeonline -errorAction Stop
+            }
+            catch
+            {
+                out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
+                out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+                exit
+            }
+
         }
     } -throttleLimit ($exoCredentials.count)
 }
