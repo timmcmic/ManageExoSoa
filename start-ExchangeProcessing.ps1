@@ -52,14 +52,11 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Thread attempting exchange online connection.")
             out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
-            write-host "I had an issue..."
-            start-sleep -s 10
-            exit
         }
 
         out-logfile -string ($threadCounter.tostring() + ":Obtain the Exchange Online Connection ID.")
 
-         try
+        try
         {
             $connectionID = (get-ConnectionInformation -errorAction STOP).connectionID
             out-logfile -string ($threadCounter.tostring() + ":ConnectionID:"+$connectionID.tostring())
@@ -68,9 +65,6 @@ function start-ExchangeProcessing
         {
             out-logfile -string "Unable to obtain the connection id."
             out-logfile -string $_
-            write-host "I had an issue..."
-            start-sleep -s 10
-            exit
         }
 
         out-logfile -string ($threadCounter.tostring() + ":Using header: " + $headerValue)
@@ -114,8 +108,6 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
             out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
-            write-host "I had an issue..."
-            start-sleep -s 10
             exit
         }
     } -throttleLimit ($exoCredentials.count)
