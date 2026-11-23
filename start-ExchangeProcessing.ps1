@@ -104,6 +104,7 @@ function start-ExchangeProcessing
         try
         {
             disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID -errorAction Stop
+            start-sleep -seconds (Get-Random -minimum 5 -maximum 10)
         }
         catch
         {
