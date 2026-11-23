@@ -29,10 +29,14 @@ function start-ExchangeProcessing
         $exoCredentials = $using:exoCredentials
         $headerValue = $using:mailboxHeaderName
         $enable = $using:enable
+        $outputStorage = $using:outputStorage
         
         $scriptblock = [scriptblock]::Create($function)
 
         set-item -path "Function:\Out-Logfile" -value $scriptBlock
+
+        $iHadAnIssue = ""
+        $updateSuccess = $FALSE
 
         out-logfile -string "Increment the thread counter."
 
@@ -52,21 +56,30 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Thread attempting exchange online connection.")
             out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+            $iHadAnIssue = "EXCEPION_EXCHANGE_ONLINE_CONNECTION_FAILED"
         }
 
-        out-logfile -string ($threadCounter.tostring() + ":Obtain the Exchange Online Connection ID.")
-
-        try
+        if ($iHadAnIssue -eq "")
         {
-            $connectionID = (get-ConnectionInformation -errorAction STOP).connectionID
-            out-logfile -string ($threadCounter.tostring() + ":ConnectionID:"+$connectionID.tostring())
-        }
-        catch
-        {
-            out-logfile -string "Unable to obtain the connection id."
-            out-logfile -string $_
-        }
+            out-logfile -string ($threadCounter.tostring() + ":Obtain the Exchange Online Connection ID")
 
+            try
+            {
+                $connectionID = (get-ConnectionInformation -errorAction STOP | where {$_.userPrincipalName -eq $exoCredentials[$credentialCounter].userName}).connectionID
+                out-logfile -string ($threadCounter.tostring() + ":ConnectionID:"+$connectionID.tostring())
+            }
+            catch
+            {
+                out-logfile -string "Unable to obtain the connection id."
+                out-logfile -string $_
+                $iHadAnIssue = "EXCEPTION_EXCHANGE_ONLINE_CONNECTION_INFO_NOT_AVAILABLE"
+            }
+        }
+        else
+        {
+            out-logfile -string ($threadCounter.tostring() + ":No connection information obtained - previous failure")
+        }
+        
         out-logfile -string ($threadCounter.tostring() + ":Using header: " + $headerValue)
         out-logfile -string ($_.count.tostring())
 
@@ -82,33 +95,113 @@ function start-ExchangeProcessing
             out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id)
             $functionObject.id = $id
 
-            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + " gathering mailbox info...")
+            if ($iHadAnIssue -ne "")
+            {
+                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id +":Processing Exception:"+$iHadAnIssue)
+                $functionObject.errorMessage = $iHadAnIssue
+                $functionObject.PreviousState = "ERROR"
+                $functionObject.NewState = "ERROR"
+            }
+            else
+            {
+                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Gathering Mailbox Info")
 
-            try
-            {
-                $mailbox = get-mailbox -identity $id -errorAction Stop | select-object isExchangeCloudManaged
-                $functionObject.previousState = $mailbox.isExchangeCloudManaged
-                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":isExchangeCloudManaged:"+$mailbox.isExchangeCloudManaged)
+                try
+                {
+                    $mailbox = get-mailbox -identity $id -errorAction Stop | select-object isExchangeCloudManaged
+                    $functionObject.previousState = $mailbox.isExchangeCloudManaged
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":isExchangeCloudManaged:"+$mailbox.isExchangeCloudManaged)
+                }
+                catch
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Failed to obtain isExchangeCloudManaged.")
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
+                }
+
+                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged")
+
+               
+                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged:"+$enable)
+
+                try
+                {
+                    set-mailbox -identity $id -isExchangeCloudManaged:$enable -errorAction STOP
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged Success"+$enable)
+                    $updateSuccess = $TRUE
+                }
+                catch
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged ERROR"+$enable)
+                    $functionObject.errorMessage = $_
+                }
+
+                if ($updateSuccess -eq $TRUE)
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Gathering Mailbox Info Post Update")
+                    
+                    try
+                    {
+                        $mailbox = get-mailbox -identity $id -errorAction Stop | select-object isExchangeCloudManaged
+                        $functionObject.newState = $mailbox.isExchangeCloudManaged
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":isExchangeCloudManaged Post Update:"+$mailbox.isExchangeCloudManaged)
+                    }
+                    catch
+                    {
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Failed to obtain isExchangeCloudManaged.")
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
+                        $functionObject.newState = "ERROR"
+                    }
+                }
+                else
+                {
+                    $functionObject.newState = "ERROR"
+                }
             }
-            catch
-            {
-                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + "Failed to obtain isExchangeCloudManaged.")
-                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
-            }
+
+            $outputStorage.add($functionObject)
         }
 
-        out-logfile -string ($threadCounter.tostring() + ":Disconnecting from Exchange Online.")
+        if ($iHadAnIssue -eq "")
+        {
+            out-logfile -string ($threadCounter.tostring() + ":Disconnecting from Exchange Online.")
 
-        try
-        {
-            disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID -errorAction Stop
-            start-sleep -seconds (Get-Random -minimum 5 -maximum 10)
+            if ($connectionID.count -gt 0)
+            {
+                foreach ($connection in $connectionID)
+                {
+                    try
+                    {
+                        out-logfile -string ($threadCounter.tostring() + ":Disconnecting from Exchange Online:"+$connection)
+                        disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID -errorAction Stop
+                        start-sleep -seconds (Get-Random -minimum 5 -maximum 10)
+                    }
+                    catch
+                    {
+                        out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
+                        out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Disconnecting from Exchange Online:"+$connectionID)
+                    disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID -errorAction Stop
+                    start-sleep -seconds (Get-Random -minimum 5 -maximum 10)
+                }
+                catch
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
+                    out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+                }
+            }
         }
-        catch
+        else
         {
-            out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
-            out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
-            exit
+            out-logfile -string ($threadCounter.tostring() + ":Disconnection not necessary - previous issue encountered.")
         }
     } -throttleLimit ($exoCredentials.count)
+
+    return ,$outputStorage
 }

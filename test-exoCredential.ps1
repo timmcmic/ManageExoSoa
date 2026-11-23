@@ -32,7 +32,7 @@ function test-exoCredentials
 
             try
             {
-                $connectionID = (get-ConnectionInformation -errorAction STOP).connectionID
+                $connectionID = (get-ConnectionInformation -errorAction STOP | where {$_.userPrincipalName -eq $credential.userName}).connectionID
                 out-logfile -string $connectionID.tostring()
                 $functionObject.connectionID = $connectionID
             }

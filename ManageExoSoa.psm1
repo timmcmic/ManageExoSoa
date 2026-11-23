@@ -102,7 +102,10 @@ function start-manageExoSoa
 
     $global:htmlTime['StartExchangeProcessing']=Get-Date
 
-    start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
+    $threadSafeList = start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
+
+    write-host $threadSafeList.getType()
+    start-sleep -s 300
 
     $telemetryEndTime = get-universalDateTime
 
