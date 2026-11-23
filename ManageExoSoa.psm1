@@ -8,7 +8,11 @@ function start-manageExoSoa
         [Parameter(Mandatory = $true)]
         [array]$mailboxes,
         [Parameter(Mandatory = $true)]
+        [string]$mailboxHeaderName,
+        [Parameter(Mandatory = $true)]
         [array]$exoCredentials,
+        [Parameter(Mandatory = $false)]
+        [boolean]$enable=$TRUE,
         [Parameter(Mandatory =$FALSE)]
         [boolean]$allowTelemetryCollection=$TRUE
     )
@@ -41,6 +45,8 @@ function start-manageExoSoa
     #Define random variables.
 
     $maxCredentialCount = 5
+    $threadSafeList = [System.Collections.Concurrent.ConcurrentBag[psObject]]::new()
+    $chunks = [System.Collections.Generic.List[psCustomObject]]::New()
 
     #Initialize telemetry collection.
 
@@ -86,8 +92,11 @@ function start-manageExoSoa
         test-credentials -credentialsToTest $credential
     }
 
-   
+    $global:htmlTime['StartBatchProcessing']=Get-Date
 
+    $chunks = get-ChunkList -listToChunk $mailboxes -userBatchSize 100
+
+    start-sleep -s 30
 
     $telemetryEndTime = get-universalDateTime
 
