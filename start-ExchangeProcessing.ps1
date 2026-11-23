@@ -103,7 +103,7 @@ function start-ExchangeProcessing
 
         try
         {
-            disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID errorAction Stop
+            disconnect-exchangeonline -confirm:$FALSE -connectionID $connectionID -errorAction Stop
         }
         catch
         {

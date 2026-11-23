@@ -59,6 +59,7 @@ function test-exoCredentials
             {
                 Disconnect-ExchangeOnline -confirm:$FALSE -errorAction STOP -connectionID $connectionID
                 out-logfile -string "Exchange disconnected successfully."
+                start-sleepProgress -sleepstring "Sleeping after disconnect..." -sleepSeconds 5
             }
             catch
             {
