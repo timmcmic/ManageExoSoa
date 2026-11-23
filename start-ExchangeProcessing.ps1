@@ -45,7 +45,7 @@ function start-ExchangeProcessing
 
             try
             {
-                connect-exchangeonline -credential $exoCredential[$credentialCounter] -errorAction STOP
+                connect-exchangeonline -credential $exoCredentials[$credentialCounter] -errorAction STOP
             }
             catch
             {
@@ -58,7 +58,7 @@ function start-ExchangeProcessing
 
             try
             {
-                disconnect-exchangeonline -errorAction Stop
+                disconnect-exchangeonline -confirm:$FALSE -errorAction Stop
             }
             catch
             {
