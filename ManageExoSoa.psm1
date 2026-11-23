@@ -106,8 +106,9 @@ function start-manageExoSoa
 
     $global:htmlTime['StartHTMLProcess']=Get-Date
 
-    write-host $threadSafeList.getType()
     wait-debugger
+
+    generate-htmlReport -threadSafeList $threadSafeList
 
     $telemetryEndTime = get-universalDateTime
 

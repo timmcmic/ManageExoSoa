@@ -12,9 +12,9 @@ function generate-HTMLReport
     out-logfile -string "Entering generate-HTMLReport"
     out-logfile -string $global:functionHTMLFile
 
-    $headerString = "EXO SOA Report"
+    $headerString = "EXO SOA Change Report"
 
-     new-HTML -TitleText "EXO SOA Report" -FilePath $global:functionHTMLFile{
+     new-HTML -TitleText "EXO SOA Change Report" -FilePath $global:functionHTMLFile{
         New-HTMLHeader{
             New-HTMLText -Text $headerString -FontSize 24 -Color White -BackGroundColor Black -Alignment center
         }
@@ -25,10 +25,11 @@ function generate-HTMLReport
                 } -AutoSize
             }-HeaderTextAlignment "Left" -HeaderTextSize "16" -HeaderTextColor "White" -HeaderBackGroundColor "Black"  -CanCollapse -BorderRadius 10px -collapsed
             New-HTMLSection -HeaderText "Summary ERRORS"  {
-                new-htmlTable -DataTable ($threadSafeList | where {$_.errorMessage -ne "None"} | Select-Object ID,PreviousState,NewState) -Filtering {
+                new-htmlTable -DataTable ($threadSafeList | where {$_.errorMessage -ne "None"} | Select-Object ID,PreviousState,NewState,ErrorMessage) -Filtering {
                 } -AutoSize
             }-HeaderTextAlignment "Left" -HeaderTextSize "16" -HeaderTextColor "Red" -HeaderBackGroundColor "Black"  -CanCollapse -BorderRadius 10px -collapsed
         } 
     }-online -ShowHTML
+
     out-logfile -string "Exiting generate-HTMLReport"
 }
