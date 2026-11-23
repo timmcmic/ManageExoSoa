@@ -107,6 +107,9 @@ function start-manageExoSoa
 
     $chunks = get-ChunkList -listToChunk $mailboxes -userBatchSize 100
 
+    out-logfile -string "Clearing mailboxes memory."
+    $mailboxes = $null
+
     $global:htmlTime['StartExchangeProcessing']=Get-Date
 
     $threadSafeList = start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
