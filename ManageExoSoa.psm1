@@ -96,7 +96,9 @@ function start-manageExoSoa
 
     $chunks = get-ChunkList -listToChunk $mailboxes -userBatchSize 100
 
-    start-sleep -s 30
+    $global:htmlTime['StartExchangeProcessing']=Get-Date
+
+    start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
 
     $telemetryEndTime = get-universalDateTime
 
