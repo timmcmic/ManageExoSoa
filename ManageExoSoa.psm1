@@ -27,7 +27,12 @@ function start-manageExoSoa
     $windowTitle = ("Start-ManageExoSOA")
     $host.ui.RawUI.WindowTitle = $windowTitle
 
-    #Define telemetry values.
+    #Define exports.
+
+    $exportNames = @{}
+    $exportNames['importedData']="ImportedData"
+    $exportNames['Success']="Success"
+    $exportNames['Errors']="Errors"
 
     #Create telemetry values.
 
@@ -65,6 +70,8 @@ function start-manageExoSoa
     out-logfile -string "*****************************************************"
     out-logfile -string "Entering Start-ManageExoSoa"
     out-logfile -string "*****************************************************"
+
+    out-xmlFile -itemToExport $exoMailboxes -itemNameToExport $exportNames[importedData]
 
     if ($allowTelemetryCollection -eq $TRUE)
     {
@@ -106,9 +113,12 @@ function start-manageExoSoa
 
     $global:htmlTime['StartHTMLProcess']=Get-Date
 
-    wait-debugger
-
     generate-htmlReport -threadSafeList $threadSafeList
+
+    $global:htmlTime['ExportFinalInfo']=Get-Date
+
+    out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
+    out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
 
     $telemetryEndTime = get-universalDateTime
 
@@ -123,4 +133,6 @@ function start-manageExoSoa
     $telemetryEventMetrics = @{
             TotalTime = $telemetryElapsedSeconds  
     }
+
+    send-TelemetryEvent -traceModuleName $traceModuleName -eventName $telemetryValues.telemetryEventName -eventMetrics $telemetryEventMetrics -eventProperties $telemetryEventProperties
 }
