@@ -20,7 +20,7 @@ function start-ExchangeProcessing
     $myFunction = ${function:out-logfile}.tostring()
     $counter = [System.Collections.Concurrent.ConcurrentDictionary[string,int]]::new()
 
-    $counter['Count'] = 0
+    $counter['Count'] = -1
 
     $chunks | foreach-object -Parallel {
         $global:logfile = $using:logFile
@@ -52,6 +52,8 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Thread attempting exchange online connection.")
             out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+            write-host "I had an issue..."
+            start-sleep -s 10
             exit
         }
 
@@ -66,6 +68,8 @@ function start-ExchangeProcessing
         {
             out-logfile -string "Unable to obtain the connection id."
             out-logfile -string $_
+            write-host "I had an issue..."
+            start-sleep -s 10
             exit
         }
 
@@ -110,6 +114,8 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Thread attempting to disconect exchange online connection.")
             out-logfile -string ($threadCounter.tostring() + ":" + $_.exception.message)
+            write-host "I had an issue..."
+            start-sleep -s 10
             exit
         }
     } -throttleLimit ($exoCredentials.count)
