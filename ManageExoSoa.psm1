@@ -104,18 +104,19 @@ function start-manageExoSoa
 
     $threadSafeList = start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
 
+    $global:htmlTime['StartHTMLProcess']=Get-Date
+
     write-host $threadSafeList.getType()
-    start-sleep -s 300
+    wait-debugger
 
     $telemetryEndTime = get-universalDateTime
 
     [double]$telemetryElapsedSeconds = get-elapsedTime -startTime $telemetryStartTime -endTime $telemetryEndTime
 
     $telemetryEventProperties = @{
-        M365DomainMGMT = "Start-M365DomainManagement"
+        M365DomainMGMT = "Start-ManageExoSOA"
         M365DomainMGMTVersion = $telemetryValues.telemetryM365DomainMgmtVersion
         ExchangeOnline = $telemetryValues.telemetryExchangeOnlineVersion
-        OperationSelected = $domainOperation
     }
 
     $telemetryEventMetrics = @{
