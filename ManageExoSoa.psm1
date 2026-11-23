@@ -71,7 +71,7 @@ function start-manageExoSoa
     out-logfile -string "Entering Start-ManageExoSoa"
     out-logfile -string "*****************************************************"
 
-    out-xmlFile -itemToExport $exoMailboxes -itemNameToExport $exportNames['importedData']
+    out-xmlFile -itemToExport $Mailboxes -itemNameToExport $exportNames['importedData']
 
     if ($allowTelemetryCollection -eq $TRUE)
     {
