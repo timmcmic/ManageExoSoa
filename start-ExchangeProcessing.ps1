@@ -83,6 +83,8 @@ function start-ExchangeProcessing
         out-logfile -string ($threadCounter.tostring() + ":Using header: " + $headerValue)
         out-logfile -string ($_.count.tostring())
 
+        $itemCounter = 0
+
         foreach ($id in $psitem.($headerValue))
         {
             $functionObject = New-Object PSObject -Property @{
@@ -92,7 +94,9 @@ function start-ExchangeProcessing
                 ErrorMessage = "None"
             }
 
-            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id)
+            out-logfile -string ($threadCounter.tostring() + ":Processing ID:" + $id)
+            out-logfile -string ($threadCounter.tostring() + ":Processing ID:" + $id + ":Item Number:"+$itemCounter)
+            $itemCounter++
             $functionObject.id = $id
 
             if ($iHadAnIssue -ne "")
