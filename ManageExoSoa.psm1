@@ -92,6 +92,10 @@ function start-manageExoSoa
         test-credentials -credentialsToTest $credential
     }
 
+    $global:htmlTime['TestEXOConnections']=Get-Date
+
+    test-exoCredentials -exoCredentials $exoCredentials
+
     $global:htmlTime['StartBatchProcessing']=Get-Date
 
     $chunks = get-ChunkList -listToChunk $mailboxes -userBatchSize 100
