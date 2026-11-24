@@ -122,6 +122,9 @@ function start-manageExoSoa
 
     wait-debugger
 
+    $success = $threadSafeList | where {$_.errorMessage -eq "none"}
+    $errors = $threadSafeList | where {$_.errorMessage -ne "none"}
+
     out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
     out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
 

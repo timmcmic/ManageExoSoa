@@ -94,8 +94,8 @@ function start-ExchangeProcessing
                 ErrorMessage = "None"
             }
 
-            out-logfile -string ($threadCounter.tostring() + ":Processing ID:" + $id)
-            out-logfile -string ($threadCounter.tostring() + ":Processing ID:" + $id + ":Item Number:"+$itemCounter)
+            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id)
+            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Item Number:"+$itemCounter)
             $itemCounter++
             $functionObject.id = $id
 
