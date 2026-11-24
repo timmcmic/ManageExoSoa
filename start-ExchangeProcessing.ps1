@@ -46,7 +46,7 @@ function start-ExchangeProcessing
 
         $htmlStringStart = ('Started Thread Processing: '+$threadCounter.tostring())
         $htmlStringEnd = ('Ended Thread Processing: '+$threadCounter.tostring())
-        $htmlTime['$htmlStringStart']
+        $htmlTime['$htmlStringStart'] = Get-Date
 
         out-logfile -string ("This is the current thread counter: "+$threadCounter.tostring())
         out-logfile  -string ("This is the current credential counter: "+$credentialCounter.tostring())
@@ -211,7 +211,7 @@ function start-ExchangeProcessing
             out-logfile -string ($threadCounter.tostring() + ":Disconnection not necessary - previous issue encountered.")
         }
 
-        $htmlTime['$htmlStringEnd']
+        $htmlTime['$htmlStringEnd'] = Get-Date
 
     } -throttleLimit ($exoCredentials.count)
 
