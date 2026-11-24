@@ -17,7 +17,7 @@ function start-manageExoSoa
         [boolean]$allowTelemetryCollection=$TRUE
     )
 
-    $global:htmlTime = @{}
+    $global:htmlTime = [hashtable]::Synchronized(@{})
     $global:htmlTime['StartTime']=Get-Date
 
     $telemetryStartTime = get-universalDateTime
