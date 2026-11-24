@@ -120,8 +120,6 @@ function start-manageExoSoa
 
     $global:htmlTime['ExportFinalInfo']=Get-Date
 
-    wait-debugger
-
     $success = $threadSafeList | where {$_.errorMessage -eq "none"}
     $errors = $threadSafeList | where {$_.errorMessage -ne "none"}
 
