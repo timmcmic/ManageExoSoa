@@ -2,7 +2,7 @@ function generate-HTMLReport
 {
     Param
     (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         $threadSafeList
     )
 
