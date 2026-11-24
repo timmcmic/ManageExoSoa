@@ -211,7 +211,7 @@ function start-ExchangeProcessing
             out-logfile -string ($threadCounter.tostring() + ":Disconnection not necessary - previous issue encountered.")
         }
 
-        $htmlTime['$htmlStringStart']
+        $htmlTime['$htmlStringEnd']
 
     } -throttleLimit ($exoCredentials.count)
 
