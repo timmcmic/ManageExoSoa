@@ -45,7 +45,7 @@ function start-ExchangeProcessing
         $credentialCounter = $threadCounter % $exoCredentials.count
 
         $htmlStringStart = ('Started Thread Processing: '+$threadCounter.tostring())
-        $htmlStringEnd = = ('Ended Thread Processing: '+$threadCounter.tostring())
+        $htmlStringEnd = ('Ended Thread Processing: '+$threadCounter.tostring())
         $htmlTime['$htmlStringStart']
 
         out-logfile -string ("This is the current thread counter: "+$threadCounter.tostring())
