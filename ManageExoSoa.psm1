@@ -83,7 +83,7 @@ function start-manageExoSoa
 
     $global:htmlTime['TestHeader']=Get-Date
 
-    if ($mailboxes.$mailboxHeaderName)
+    if ($mailboxes[0].PSObject.Properties.Name -contains $mailboxHeaderName)
     {
         out-logfile -string "The header was found in the imported data - proceed."
     }
