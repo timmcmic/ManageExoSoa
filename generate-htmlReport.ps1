@@ -30,7 +30,7 @@ function generate-HTMLReport
             }-HeaderTextAlignment "Left" -HeaderTextSize "16" -HeaderTextColor "Red" -HeaderBackGroundColor "Black"  -CanCollapse -BorderRadius 10px -collapsed
             new-htmlSection -HeaderText ("Timline of Events"){
                     new-HTMLTimeLIne {
-                        foreach ($item in $htmlTime.GetEnumerator())
+                        foreach ($item in $global:htmlTime.GetEnumerator())
                         {
                             new-HTMLTimeLineItem -HeadingText $item.key -Date $item.value
                         }

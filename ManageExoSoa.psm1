@@ -71,6 +71,8 @@ function start-manageExoSoa
     out-logfile -string "Entering Start-ManageExoSoa"
     out-logfile -string "*****************************************************"
 
+    $global:htmlTime['ExportInitialDate']=Get-Date
+
     out-xmlFile -itemToExport $Mailboxes -itemNameToExport $exportNames['importedData']
 
     if ($allowTelemetryCollection -eq $TRUE)
@@ -114,14 +116,7 @@ function start-manageExoSoa
 
     $threadSafeList = start-ExchangeProcessing -chunks $chunks -enable $enable -mailboxHeaderName $mailboxHeaderName -exoCredentials $exoCredentials -outputStorage $threadSafeList
 
-    $global:htmlTime['StartHTMLProcess']=Get-Date
-
-    generate-htmlReport -threadSafeList $threadSafeList
-
     $global:htmlTime['ExportFinalInfo']=Get-Date
-
-    $success = $threadSafeList | where {$_.errorMessage -eq "none"}
-    $errors = $threadSafeList | where {$_.errorMessage -ne "none"}
 
     if (($threadSafeList | where {$_.errorMessage -eq "None"}).count -gt 0)
     {
@@ -142,6 +137,11 @@ function start-manageExoSoa
     {
         out-logfile -string "HAPPY :-) No errors items to export."
     }
+
+    $global:htmlTime['StartHTMLProcess']=Get-Date
+    $global:htmlTime['EndProcess']=Get-Date
+    
+    generate-htmlReport -threadSafeList $threadSafeList
 
     $telemetryEndTime = get-universalDateTime
 
