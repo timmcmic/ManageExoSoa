@@ -120,6 +120,8 @@ function start-manageExoSoa
 
     $global:htmlTime['ExportFinalInfo']=Get-Date
 
+    wait-debugger
+
     out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
     out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
 
