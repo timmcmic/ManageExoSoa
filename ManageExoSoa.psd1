@@ -39,7 +39,7 @@ Description = 'Provides bulk functionality for setting the exo soa bit on mailbo
 # PowerShellHostName = ''
 
 # Minimum version of the PowerShell host required by this module
-# PowerShellHostVersion = ''
+PowerShellHostVersion = '7.7.0'
 
 # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
 # DotNetFrameworkVersion = ''
