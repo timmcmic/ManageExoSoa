@@ -89,6 +89,10 @@ function start-manageExoSoa
     }
     else
     {
+        foreach ($property in $mailboxes[0].PSObject.Properties.Name)
+        {
+            out-logfile -string $property
+        }
         out-logfile -string "The header specified was not located in the imported data."
         out-logfile -string "Imported data must have a defined header matching what was provided during runtime."
         out-logfile -string "EXCEPTION_HEADER_NOT_FOUND_IN_IMPORTED_DATA" -isError:$TRUE
