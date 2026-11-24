@@ -28,6 +28,14 @@ function generate-HTMLReport
                 new-htmlTable -DataTable ($threadSafeList | where {$_.errorMessage -ne "None"} | Select-Object ID,PreviousState,NewState,ErrorMessage) -Filtering {
                 } -AutoSize
             }-HeaderTextAlignment "Left" -HeaderTextSize "16" -HeaderTextColor "Red" -HeaderBackGroundColor "Black"  -CanCollapse -BorderRadius 10px -collapsed
+            new-htmlSection -HeaderText ("Timline of Events"){
+                    new-HTMLTimeLIne {
+                        foreach ($item in $htmlTime.GetEnumerator())
+                        {
+                            new-HTMLTimeLineItem -HeadingText $item.key -Date $item.value
+                        }
+                    }
+            } -HeaderTextAlignment "Left" -HeaderTextSize "16" -HeaderTextColor "White" -HeaderBackGroundColor "Black"  -CanCollapse -BorderRadius 10px -collapsed
         } 
     }-online -ShowHTML
 

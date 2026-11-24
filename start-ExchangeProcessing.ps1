@@ -30,6 +30,7 @@ function start-ExchangeProcessing
         $headerValue = $using:mailboxHeaderName
         $enable = $using:enable
         $outputStorage = $using:outputStorage
+        $htmlTime = $using:htmlTime
         
         $scriptblock = [scriptblock]::Create($function)
 
@@ -42,6 +43,10 @@ function start-ExchangeProcessing
 
         $threadCounter = $counter.addOrUpdate('Count',1,[Func[string,int,int]] { param($key, $value) $value + 1 })
         $credentialCounter = $threadCounter % $exoCredentials.count
+
+        $htmlStringStart = ('Started Thread Processing: '+$threadCounter.tostring())
+        $htmlStringEnd = = ('Ended Thread Processing: '+$threadCounter.tostring())
+        $htmlTime['$htmlStringStart']
 
         out-logfile -string ("This is the current thread counter: "+$threadCounter.tostring())
         out-logfile  -string ("This is the current credential counter: "+$credentialCounter.tostring())
@@ -205,6 +210,9 @@ function start-ExchangeProcessing
         {
             out-logfile -string ($threadCounter.tostring() + ":Disconnection not necessary - previous issue encountered.")
         }
+
+        $htmlTime['$htmlStringStart']
+
     } -throttleLimit ($exoCredentials.count)
 
     return ,$outputStorage
