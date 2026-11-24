@@ -72,13 +72,26 @@ function start-manageExoSoa
     out-logfile -string "Entering Start-ManageExoSoa"
     out-logfile -string "*****************************************************"
 
+    if ($allowTelemetryCollection -eq $TRUE)
+    {
+        start-telemetryConfiguration -allowTelemetryCollection $allowTelemetryCollection -appInsightAPIKey $appInsightAPIKey -traceModuleName $traceModuleName
+    }
+
     $global:htmlTime['ExportInitialDate']=Get-Date
 
     out-xmlFile -itemToExport $Mailboxes -itemNameToExport $exportNames['importedData']
 
-    if ($allowTelemetryCollection -eq $TRUE)
+    $global:htmlTime['TestHeader']=Get-Date
+
+    if ($mailboxes.$mailboxHeaderName)
     {
-        start-telemetryConfiguration -allowTelemetryCollection $allowTelemetryCollection -appInsightAPIKey $appInsightAPIKey -traceModuleName $traceModuleName
+        out-logfile -string "The header was found in the imported data - proceed."
+    }
+    else
+    {
+        out-logfile -string "The header specified was not located in the imported data."
+        out-logfile -string "Imported data must have a defined header matching what was provided during runtime."
+        out-logfile -string "EXCEPTION_HEADER_NOT_FOUND_IN_IMPORTED_DATA" -isError:$TRUE
     }
 
     #Test and record powershell module versions.
