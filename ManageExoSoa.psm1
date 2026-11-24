@@ -125,8 +125,25 @@ function start-manageExoSoa
     $success = $threadSafeList | where {$_.errorMessage -eq "none"}
     $errors = $threadSafeList | where {$_.errorMessage -ne "none"}
 
-    out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
-    out-xmlfile -itemToExport ($thredSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
+    if (($threadSafeList | where {$_.errorMessage -eq "None"}).count -gt 0)
+    {
+        out-logfile -string "Output success items to xml."
+        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
+    }
+    else
+    {
+        out-logfile -string "SAD :-( No success items to export."
+    }
+
+    if (($threadSafeList | where {$_.errorMessage -ne "None"}).count -gt 0)
+    {
+        out-logfile -string "Output error items to xml."
+        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
+    }
+    else
+    {
+        out-logfile -string "HAPPY :-) No errors items to export."
+    }
 
     $telemetryEndTime = get-universalDateTime
 
@@ -139,7 +156,9 @@ function start-manageExoSoa
     }
 
     $telemetryEventMetrics = @{
-            TotalTime = $telemetryElapsedSeconds  
+            TotalTime = $telemetryElapsedSeconds
+            Success =  ($threadSafeList | where {$_.errorMessage -eq "None"}).count
+            Errors = ($threadSafeList | where {$_.errorMessage -ne "None"}).count
     }
 
     send-TelemetryEvent -traceModuleName $traceModuleName -eventName $telemetryValues.telemetryEventName -eventMetrics $telemetryEventMetrics -eventProperties $telemetryEventProperties
