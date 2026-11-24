@@ -82,6 +82,6 @@ function test-exoCredentials
 
     if ($success.success.contains("FAILED"))
     {
-        out-logfile -string "One or more exo credentials failed to connect - see logs." -isError:$TRUE
+        out-logfile -string "EXO_CONNECTION_CREDENTIAL_FAILED: One or more exo credentials failed to connect - see logs." -isError:$TRUE
     }
 }
