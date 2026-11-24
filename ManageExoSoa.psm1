@@ -121,7 +121,7 @@ function start-manageExoSoa
     if (($threadSafeList | where {$_.errorMessage -eq "None"}).count -gt 0)
     {
         out-logfile -string "Output success items to xml."
-        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames ['Success']
+        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -eq "None"}) -itemNameToExport $exportNames['Success']
     }
     else
     {
@@ -131,7 +131,7 @@ function start-manageExoSoa
     if (($threadSafeList | where {$_.errorMessage -ne "None"}).count -gt 0)
     {
         out-logfile -string "Output error items to xml."
-        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames ['Errors']
+        out-xmlfile -itemToExport ($threadSafeList | where {$_.errorMessage -ne "None"}) -itemNameToExport $exportNames['Errors']
     }
     else
     {
@@ -140,7 +140,7 @@ function start-manageExoSoa
 
     $global:htmlTime['StartHTMLProcess']=Get-Date
     $global:htmlTime['EndProcess']=Get-Date
-    
+
     generate-htmlReport -threadSafeList $threadSafeList
 
     $telemetryEndTime = get-universalDateTime
