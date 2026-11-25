@@ -127,43 +127,50 @@ function start-ExchangeProcessing
                     out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
                 }
 
-                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged")
-
+                if ($mailbox.isExchangeCloudManaged -ne $enable)
+                {
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged")
                
-                out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged:"+$enable)
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged to:"+$enable)
 
-                try
-                {
-                    set-mailbox -identity $id -isExchangeCloudManaged:$enable -errorAction STOP
-                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged Success"+$enable)
-                    $updateSuccess = $TRUE
-                }
-                catch
-                {
-                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged ERROR"+$enable)
-                    $functionObject.errorMessage = $_
-                }
-
-                if ($updateSuccess -eq $TRUE)
-                {
-                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Gathering Mailbox Info Post Update")
-                    
                     try
                     {
-                        $mailbox = get-mailbox -identity $id -errorAction Stop | select-object isExchangeCloudManaged
-                        $functionObject.newState = $mailbox.isExchangeCloudManaged
-                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":isExchangeCloudManaged Post Update:"+$mailbox.isExchangeCloudManaged)
+                        set-mailbox -identity $id -isExchangeCloudManaged:$enable -errorAction STOP
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged Success"+$enable)
+                        $updateSuccess = $TRUE
                     }
                     catch
                     {
-                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Failed to obtain isExchangeCloudManaged.")
-                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Updating IsExchangeCloudManaged ERROR"+$enable)
+                        $functionObject.errorMessage = $_
+                    }
+
+                    if ($updateSuccess -eq $TRUE)
+                    {
+                        out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Gathering Mailbox Info Post Update")
+                        
+                        try
+                        {
+                            $mailbox = get-mailbox -identity $id -errorAction Stop | select-object isExchangeCloudManaged
+                            $functionObject.newState = $mailbox.isExchangeCloudManaged
+                            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":isExchangeCloudManaged Post Update:"+$mailbox.isExchangeCloudManaged)
+                        }
+                        catch
+                        {
+                            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":Failed to obtain isExchangeCloudManaged.")
+                            out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":"+$_)
+                            $functionObject.newState = "ERROR"
+                        }
+                    }
+                    else
+                    {
                         $functionObject.newState = "ERROR"
                     }
                 }
                 else
                 {
-                    $functionObject.newState = "ERROR"
+                    out-logfile -string ($threadCounter.tostring() + ":Processing ID: " + $id + ":No Update Required - Value Already Set")
+                    $functionObject.newState = "NO_CHANGE"
                 }
             }
 
